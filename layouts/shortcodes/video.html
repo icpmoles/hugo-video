@@ -24,6 +24,10 @@
 {{- /* Find first image file with filename (without suffix) matching "src" parameter. */ -}}
 {{- $poster := ((.Page.Resources.ByType "image").GetMatch (printf "%s*" $video_src)) -}}
 
+
+{{- /* Find in page bundle all valid VTT files with matching name. */ -}}  
+{{- $sub := (.Page.Resources.Match "*.vtt" ) -}}
+
 {{- /* Find in page bundle all valid video files with matching name. */ -}}
 {{- with $video_files -}}
   {{- $filenotfound = false -}}
@@ -49,6 +53,13 @@
 {{- else if $unsupportedfile -}}
   {{- errorf "No valid video file with filename %q found." $video_src -}}
 {{- else -}}
+
+{{- if $filenotfound -}}
+  {{- /* No file of given name was found, we stop here. */ -}}
+  {{- errorf "No file with filename %q found." $video_src -}}
+{{- else if $unsupportedfile -}}
+  {{- errorf "No valid video file with filename %q found." $video_src -}}
+{{- else -}}
 <video {{ if ne (.Get "controls") "false" }}controls {{ end }}preload="auto" width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }}{{ if eq (.Get "muted") "true" }}muted {{ end }}{{ with $poster }}poster="{{ .RelPermalink }}" {{ end }}playsinline class="html-video">
   {{- with $video_webm }}
     <source src="{{ .RelPermalink }}" type="video/webm" }}>
@@ -62,6 +73,12 @@
     <source src="{{ .RelPermalink }}" type="video/mp4" }}>
     {{- $video_dl = . -}}
   {{- end }}
+  {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
+  {{ with $sub }} 
+    {{- range . -}}
+    <track src="{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
+    {{- end -}}
+  {{- end -}}
   <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
 </video>
 {{- end -}}
