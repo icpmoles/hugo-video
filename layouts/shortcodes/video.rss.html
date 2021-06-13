@@ -54,26 +54,26 @@
       {{- errorf "No valid video file with filename %q found." $video_src -}}
     {{- else -}}
 
-  <video  preload="{{ if ne $preload "metadata" }}{{ $preload }}{{else}}metadata{{ end }}" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .Permalink }}" {{ end }} playsinline class="html-video">
+  <video  preload="{{ if ne $preload "metadata" }}{{ $preload }}{{else}}metadata{{ end }}" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .RelPermalink }}" {{ end }} playsinline class="html-video">
       {{- with $video_webm }}
-        <source src="{{ .Permalink }}" type="video/webm" }}>
+        <source src="{{ .RelPermalink }}" type="video/webm">
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_ogg }}
-        <source src="{{ .Permalink }}" type="video/ogg" }}>
+        <source src="{{ .Permalink }}" type="video/ogg">
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_mp4 }}
-        <source src="{{ .Permalink }}" type="video/mp4" }}>
+        <source src="{{ .Permalink }}" type="video/mp4">
         {{- $video_dl = . -}}
       {{- end }}
       {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
       {{ with $sub }} 
         {{- range . -}}
-        <track src="{{ .Permalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
+        <track src="{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
         {{- end -}}
       {{- end -}}
-     {{ with $poster }} <img src="{{ .Permalink }}" width="500" height="600"> {{ end }}
+     {{ with $poster }} <img src="{{ .RelPermalink }}" width="500" height="600"> {{ end }}
       <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
     </video>
     {{- end -}}
