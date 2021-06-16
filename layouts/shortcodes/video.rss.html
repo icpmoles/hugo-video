@@ -46,7 +46,11 @@
         {{- end -}}
       {{- end -}}
     {{- end -}}
-    
+
+    {{- /* If there is a poster file edits it to display for the preview or the error message */ -}}
+    {{- $logo := resources.Get "images/play.png" -}}
+    {{- $logoFilter := (images.Overlay $logo  (sub ( div $poster.Width 2) ( div $logo.Width 2)) (sub ( div $poster.Height 2) ( div $logo.Height 2))) -}}
+  
     {{- if $filenotfound -}}
       {{- /* No file of given name was found, we stop here. */ -}}
       {{- errorf "No file with filename %q found." $video_src -}}
@@ -54,13 +58,14 @@
       {{- errorf "No valid video file with filename %q found." $video_src -}}
     {{- else -}}
 
-  <video  preload="{{ if ne $preload "metadata" }}{{ $preload }}{{else}}metadata{{ end }}" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .RelPermalink }}" {{ end }} playsinline class="html-video">
+  <video  preload="{{ if ne $preload "metadata" }}{{ $preload }}{{else}}metadata{{ end }}" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster | images.Filter $logoFilter }}poster="{{ .Permalink  }}" {{ end }} playsinline class="html-video">
       {{- with $video_webm }}
-        <source src="{{ .RelPermalink }}" type="video/webm">
+        <source src="{{ .Permalink }}" type="video/webm">
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_ogg }}
-        <source src="{{ .Permalink }}" type="video/ogg">
+        <source src="{{ .Permalink |  absURL  }}" type="video/ogg">
+  {{- /* For some reasons if I remove the |absUrl everything breaks for the RSS  */ -}}
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_mp4 }}
@@ -70,10 +75,12 @@
       {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
       {{ with $sub }} 
         {{- range . -}}
-        <track src="{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
+        <track src="{{ .Permalink | absURL }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
         {{- end -}}
       {{- end -}}
-     {{ with $poster }} <img src="{{ .RelPermalink }}" width="500" height="600"> {{ end }}
+      {{- $logo := resources.Get "images/download.png" -}}
+      {{- $logoFilter := (images.Overlay $logo  (sub ( div $poster.Width 2) ( div $logo.Width 2)) (sub ( div $poster.Height 2) ( div $logo.Height 2))) -}}
+      {{- with ($poster | images.Filter $logoFilter).Resize "600x q50" -}} {{- with $video_dl -}} <a href="{{- .Permalink | absURL -}}"> {{- end -}} <img src="{{ .Permalink }}" width="500" height="600"></a> {{ end }}
       <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
     </video>
     {{- end -}}
