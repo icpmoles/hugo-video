@@ -75,7 +75,7 @@
       {{- end -}}
       {{- $logo := resources.Get "images/download.png" -}}
       {{- $logoFilter := (images.Overlay $logo  (sub ( div $poster.Width 2) ( div $logo.Width 2)) (sub ( div $poster.Height 2) ( div $logo.Height 2))) -}}
-      {{- with ($poster | images.Filter $logoFilter).Resize "600x q50" -}} {{- with $video_dl -}} <a href="{{ .RelPermalink }}"> {{- end -}} <img src="{{ .RelPermalink }}" width="500" height="600"></a> {{ end }}
+      {{- with ($poster | images.Filter $logoFilter).Resize "600x q80" -}} <a href="{{  $video_dl.RelPermalink }}"> <img src="{{ .RelPermalink }}" width="500" height="600"></a> {{ end }}
       <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
     </video>
     {{- end -}}

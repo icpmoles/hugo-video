@@ -58,9 +58,9 @@
       {{- errorf "No valid video file with filename %q found." $video_src -}}
     {{- else -}}
 
-  <video  preload="{{ if ne $preload "metadata" }}{{ $preload }}{{else}}metadata{{ end }}" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster | images.Filter $logoFilter }}poster="{{ .Permalink  }}" {{ end }} playsinline class="html-video">
+  <video  preload="metadata" {{ if ne (.Get "controls") "false" }}controls {{ end }} width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster | images.Filter $logoFilter }}poster="{{ .Permalink  }}" {{ end }} playsinline class="html-video">
       {{- with $video_webm }}
-        <source src="{{ .Permalink }}" type="video/webm">
+        <source src="{{ .Permalink  |  absURL}}" type="video/webm">
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_ogg }}
@@ -69,7 +69,7 @@
         {{- $video_dl = . -}}
       {{- end }}
       {{- with $video_mp4 }}
-        <source src="{{ .Permalink }}" type="video/mp4">
+        <source src="{{ .Permalink  |  absURL}}" type="video/mp4">
         {{- $video_dl = . -}}
       {{- end }}
       {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
@@ -80,7 +80,7 @@
       {{- end -}}
       {{- $logo := resources.Get "images/download.png" -}}
       {{- $logoFilter := (images.Overlay $logo  (sub ( div $poster.Width 2) ( div $logo.Width 2)) (sub ( div $poster.Height 2) ( div $logo.Height 2))) -}}
-      {{- with ($poster | images.Filter $logoFilter).Resize "600x q50" -}} {{- with $video_dl -}} <a href="{{- .Permalink | absURL -}}"> {{- end -}} <img src="{{ .Permalink }}" width="500" height="600"></a> {{ end }}
+      {{- with ($poster | images.Filter $logoFilter).Resize "600x q50" -}} <a href="{{- $video_dl.Permalink | absURL -}}"> <img src="{{ .Permalink  |  absURL }}" width="600" height="400"></a> {{ end }}
       <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
     </video>
     {{- end -}}
