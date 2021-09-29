@@ -1,0 +1,101 @@
+{{- /*  hugo-video shortcode
+    /*
+    /*    This file is part of hugo-video shortcode.
+    /*    A Hugo component shortcode to embed videos using the HTML video element.
+    /*
+    /*    @copyright  @2019 onwards Nicolas Martignoni (nicolas@martignoni.net)
+    /*    @source     https://github.com/martignoni/hugo-video
+    /*    @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+    /*
+    */ -}}
+    
+    {{- $video_src := .Get "src" -}}
+    {{- $video_mp4 := "" -}}
+    {{- $video_webm := "" -}}
+    {{- $video_ogg := "" -}}
+    {{- $video_dl := "" -}}
+    {{- $video_av1 := "" -}}
+    {{- $video_hevc := "" -}}
+    {{- $width := "100%" -}}
+    {{- $filenotfound := true -}}
+    {{- $unsupportedfile := true -}}
+    {{- $preload := .Get "preload" -}}
+    
+    {{- /* Find all files with filename (without suffix) matching "src" parameter. */ -}}
+    {{- $video_files := (.Page.Resources.Match (printf "%s*" $video_src)) -}}
+    
+    {{- /* Find first image file with filename (without suffix) matching "src" parameter. */ -}}
+    {{- $poster := ((.Page.Resources.ByType "image").GetMatch (printf "%s*" $video_src)) -}}
+
+    {{- /* Find in page bundle all valid VTT files with matching name. */ -}}  
+    {{- $sub := (.Page.Resources.Match "*.vtt" ) -}}
+    
+    {{- /* Find in page bundle all valid video files with matching name. */ -}}
+    {{- with $video_files -}}
+      {{- $filenotfound = false -}}
+      {{- range . -}}
+        {{- if or (in .MediaType.Suffixes "mp4") (in .MediaType.Suffixes "m4v") -}}
+          {{- $unsupportedfile = false -}}
+          {{- $video_mp4 = . -}}
+        {{- end -}}
+        {{- if (in .MediaType.Suffixes "webm") -}}
+          {{- $unsupportedfile = false -}}
+          {{- $video_webm = . -}}
+        {{- end -}}
+        {{- if (in .MediaType.Suffixes "ogv") -}}
+          {{- $unsupportedfile = false -}}
+          {{- $video_ogg = . -}}
+        {{- end -}}
+        {{- if ( in .Title ".av1." ) -}}
+          {{- $unsupportedfile = false -}}
+          {{- $video_av1 = . -}}
+        {{- end -}}
+        {{- if ( in .Title ".hevc." ) -}}
+          {{- $unsupportedfile = false -}}
+          {{- $video_hevc = . -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    
+    {{- if $filenotfound -}}
+      {{- /* No file of given name was found, we stop here. */ -}}
+      {{- errorf "No file with filename %q found." $video_src -}}
+    {{- else if $unsupportedfile -}}
+      {{- errorf "No valid video file with filename %q found." $video_src -}}
+    {{- else -}}
+
+  <video preload="metadata" loop="true" autoplay="true" controls="false"  muted="true"  playsinline class="html-video">
+    {{- with $video_av1 }}
+        <source src="{{ .RelPermalink }}" type="video/webm; codecs=av01.0.05M.08">
+        {{- $video_dl = . -}}
+      {{- end }}  
+    {{- with $video_hevc }}
+        <source src="{{ .RelPermalink }}" type="video/webm; codecs=hevc,mp4a.40.2">
+        {{- $video_dl = . -}}
+    {{- end }}  
+    
+    {{- with $video_webm }}
+        <source src="{{ .RelPermalink }}" type="video/webm">
+        {{- $video_dl = . -}}
+    {{- end }}
+    {{- with $video_ogg }}
+      <source src="{{ .RelPermalink }}" type="video/ogg">
+      {{- $video_dl = . -}}
+    {{- end }}
+      
+      {{- with $video_mp4 }}
+        <source src="{{ .RelPermalink }}" type="video/mp4">
+        {{- $video_dl = . -}}
+      {{- end }}
+      {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
+      {{ with $sub }} 
+        {{- range . -}}
+        <track src="{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
+        {{- end -}}
+      {{- end -}}
+      {{- $logo := resources.Get "images/download.png" -}}
+      {{- $logoFilter := (images.Overlay $logo  (sub ( div $poster.Width 2) ( div $logo.Width 2)) (sub ( div $poster.Height 2) ( div $logo.Height 2))) -}}
+      {{- with ($poster | images.Filter $logoFilter).Resize "600x q80" -}} <a href="{{  $video_dl.RelPermalink }}"> <img src="{{ .RelPermalink }}" width="500" height="600"></a> {{ end }}
+      <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
+    </video>
+    {{- end -}}
