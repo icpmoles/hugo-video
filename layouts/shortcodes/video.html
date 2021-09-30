@@ -70,7 +70,7 @@
         {{- $video_dl = . -}}
       {{- end }}  
     {{- with $video_hevc }}
-        <source src="{{ .RelPermalink }}" type="video/webm; codecs=hevc,mp4a.40.2">
+        <source src="{{ .RelPermalink }}" type="video/mp4; codecs=hevc,mp4a.40.2">
         {{- $video_dl = . -}}
     {{- end }}  
     
