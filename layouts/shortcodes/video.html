@@ -22,10 +22,10 @@
     {{- $preload := .Get "preload" -}}
     
     {{- /* Find all files with filename (without suffix) matching "src" parameter. */ -}}
-    {{- $video_files := (.Page.Resources.Match (printf "%s*" $video_src)) -}}
+    {{- $video_files := (.Page.Resources.Match (printf "%s.*" $video_src)) -}}
     
     {{- /* Find first image file with filename (without suffix) matching "src" parameter. */ -}}
-    {{- $poster := ((.Page.Resources.ByType "image").GetMatch (printf "%s*" $video_src)) -}}
+    {{- $poster := ((.Page.Resources.ByType "image").GetMatch (printf "%s.*" $video_src)) -}}
 
     {{- /* Find in page bundle all valid VTT files with matching name. */ -}}  
     {{- $sub := (.Page.Resources.Match "*.vtt" ) -}}
