@@ -3,7 +3,7 @@
 target_dir="../../content/post"
 
 # You can set: global_var will be passed to all ffmpeg commands; ffbin is the ffmpeg command or directory
-global_var=" -hide_banner"
+global_var=" -hide_banner -n"
 ffbin="ffmpeg.exe"
 
 stats=$"Size comparison: \n"
@@ -14,10 +14,10 @@ cd $target_dir
 post=$(pwd)
 echo "Found working directory: $post" 
 shopt -s nullglob
-for d in */ ; do
+for d in */ 
+do
     echo "Searching for video files in $d"
     cd $d
-    
     for v in *.source.*
     do
         convertion=0
@@ -84,7 +84,13 @@ for d in */ ; do
             fi 
             
             # Checks if the destination files already exist 
-
+            if [[ -f "${v%.source.*}.jpg" ]]
+            then
+                echo "🆗 ${v%.source.*}.jpg poster already exists."
+            else
+                echo "Creating ${v%.source.*}.jpg poster"
+                echo "ffmpeg -i  $v -vf \"select=eq(n\,0)\" -q:v 3 ${v%.source.*}.jpg "
+            fi
 
             # H264 convertion
             if [[ -f "${v%.source.*}.mp4" ]]
@@ -106,7 +112,7 @@ for d in */ ; do
             else 
                 echo "⏭ ${v%.source.*}.webm does not exist."
                 convertion=1
-                $ffbin -i $v $global_var $webm_sett -pass 1 -an -f null /dev/null 
+                $ffbin -i $v $global_var $webm_sett -pass 1 -an -f null /dev/null
                 $ffbin -i $v $global_var $webm_sett -pass 2 ${v%.source.*}.webm
                 o_br=$(ffprobe -v error -select_streams v -show_entries format=bit_rate -of csv=p=0:s=x ${v%.source.*}.webm)
                 echo $o_br
@@ -120,7 +126,7 @@ for d in */ ; do
             else 
                 echo "⏭ ${v%.source.*}.av1.webm does not exist."
                 convertion=1
-                $ffbin -i $v $global_var $av1_sett -pass 1 -an -f null /dev/null 
+                $ffbin -i $v $global_var $av1_sett -pass 1 -an -f null /dev/null
                 $ffbin -i $v $global_var $av1_sett -pass 2 ${v%.source.*}.av1.webm
                 o_br=$(ffprobe -v error -select_streams v -show_entries format=bit_rate -of csv=p=0:s=x ${v%.source.*}.av1.webm)
                 t_stats+=$" Output File: $d${v%.source.*}.av1.webm Bitrate: $o_br kb Final Size: $(echo "scale = 4; 100 * ( $o_br / $br) " | bc)% \n"
@@ -133,7 +139,7 @@ for d in */ ; do
             else 
                 echo "⏭ ${v%.source.*}.hevc.mp4 does not exist."
                 convertion=1
-                $ffbin -i $v $global_var $hevc_sett pass=1 -an -f null /dev/null 
+                $ffbin -i $v $global_var $hevc_sett pass=1 -an -f null /dev/null
                 $ffbin -i $v $global_var $hevc_sett  pass=2  ${v%.source.*}.hevc.mp4
                 o_br=$(ffprobe -v error -select_streams v -show_entries format=bit_rate -of csv=p=0:s=x ${v%.source.*}.hevc.mp4)
                 t_stats+=$" Output File: $d${v%.source.*}.hevc.mp4 Bitrate: $o_br kb Final Size: $(echo "scale = 4; 100 * ( $o_br / $br) " | bc)% \n"
@@ -145,7 +151,7 @@ for d in */ ; do
             fi
             
     done
-    # cd $post
+    cd $post
 done
 
 echo -e "$stats"
