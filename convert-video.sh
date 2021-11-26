@@ -115,7 +115,6 @@ do
                 $ffbin -i $v $global_var $webm_sett -pass 1 -an -f null /dev/null
                 $ffbin -i $v $global_var $webm_sett -pass 2 ${v%.source.*}.webm
                 o_br=$(ffprobe -v error -select_streams v -show_entries format=bit_rate -of csv=p=0:s=x ${v%.source.*}.webm)
-                echo $o_br
                 t_stats+=$" Output File: $d${v%.source.*}.webm Bitrate: $o_br kb Final Size: $(echo "scale = 4; 100 * ( $o_br / $br) " | bc)% \n"
             fi
 
