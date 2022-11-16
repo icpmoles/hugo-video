@@ -59,9 +59,9 @@
     
     {{- if $filenotfound -}}
       {{- /* No file of given name was found, we stop here. */ -}}
-      {{- errorf "No file with filename %q found." $video_src -}}
+      {{- errorf "HUGO VIDEO: No file with filename %q found in %v." $video_src $.Page.RelPermalink  -}}
     {{- else if $unsupportedfile -}}
-      {{- errorf "No valid video file with filename %q found." $video_src -}}
+      {{- errorf "HUGO VIDEO: No valid video file with filename %q found." $video_src -}}
     {{- else -}}
 
   <video preload="metadata"  {{ if ne (.Get "controls") "false" }}controls{{ end }}  width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .RelPermalink }}" {{ end }} playsinline class="html-video">
