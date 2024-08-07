@@ -66,37 +66,37 @@
 
   <video preload="metadata"  {{ if ne (.Get "controls") "false" }}controls{{ end }}  width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .RelPermalink }}" {{ end }} playsinline class="html-video">
     {{- with $video_av1 }}
-        <source src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/webm; codecs=av01.0.05M.08">
+        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/webm; codecs=av01.0.05M.08">
         {{- $video_dl = . -}}
       {{- end }}  
     {{- with $video_hevc }}
-        <source src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/mp4; codecs=hevc,mp4a.40.2">
+        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/mp4; codecs=hevc,mp4a.40.2">
         {{- $video_dl = . -}}
     {{- end }}  
     
     {{- with $video_webm }}
-        <source src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/webm">
+        <source src="{{if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/webm">
         {{- $video_dl = . -}}
     {{- end }}
     {{- with $video_ogg }}
-      <source src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/ogg">
+      <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/ogg">
       {{- $video_dl = . -}}
     {{- end }}
       
       {{- with $video_mp4 }}
-        <source src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/mp4">
+        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/mp4">
         {{- $video_dl = . -}}
       {{- end }}
       {{- /* Loops trough all the VTT files matching the src name and extracts the language code */ -}}
       {{ with $sub }} 
         {{- range . -}}
-        <track src="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
+        <track src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" kind="subtitles" srclang="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}" label="{{ slicestr (strings.TrimSuffix ".vtt" (strings.TrimPrefix $video_src .Name)) 1}}"/>
         {{- end -}}
       {{- end -}}
       {{ with $poster }}
         {{- $logo := resources.Get "images/download.png" -}}
         {{- $logoFilter := (images.Overlay $logo  (sub ( div .Width 2) ( div $logo.Width 2)) (sub ( div .Height 2) ( div $logo.Height 2))) -}}
-        {{- with ( . | images.Filter $logoFilter).Resize "600x q80" -}} <a href="{{ if eq hugo.Environment "production"  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{  $video_dl.RelPermalink }}"> <img src="{{ .RelPermalink }}" width="500" height="600"></a> {{ end }}
+        {{- with ( . | images.Filter $logoFilter).Resize "600x q80" -}} <a href="{{ if hugo.IsProduction  }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{  $video_dl.RelPermalink }}"> <img src="{{ .RelPermalink }}" width="500" height="600"></a> {{ end }}
         <p>{{ i18n "videoUnsupported" $video_dl | safeHTML}}</p>
       {{ end }}
     </video>
