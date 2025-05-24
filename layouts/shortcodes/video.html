@@ -66,11 +66,11 @@
 
   <video preload="metadata"  {{ if ne (.Get "controls") "false" }}controls{{ end }}  width="{{ or (.Get "width") $width }}" {{ with .Get "height" }}height="{{.}}"{{ end }} {{ if eq (.Get "autoplay") "true" }}autoplay {{ end }}{{ if eq (.Get "loop") "true" }}loop {{ end }} {{ if eq (.Get "muted") "true" }}muted {{ end }} {{ with $poster }}poster="{{ .RelPermalink }}" {{ end }} playsinline class="html-video">
     {{- with $video_av1 }}
-        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/webm; codecs=av01.0.05M.08">
+        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type='video/webm; codecs=av01.0.05M.08'>
         {{- $video_dl = . -}}
       {{- end }}  
     {{- with $video_hevc }}
-        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type="video/mp4; codecs=hevc,mp4a.40.2">
+        <source src="{{ if hugo.IsProduction }}{{ with $.Site.Params.externalcdn }}{{.}}{{end}}{{end}}{{ .RelPermalink }}" type='video/mp4; codecs=hevc,mp4a.40.2'>
         {{- $video_dl = . -}}
     {{- end }}  
     
